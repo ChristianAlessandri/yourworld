@@ -56,9 +56,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           children: [
             // Map Tile Provider Dropdown
-            const Text(
+            Text(
               'Map Tile Provider',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             AppDropdown.themedDropdown<String>(
@@ -71,7 +71,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final name = MapUrlTemplates.names[index];
                   return DropdownMenuItem(
                     value: url,
-                    child: Text(name),
+                    child: Text(name,
+                        style: Theme.of(context).textTheme.bodyMedium),
                   );
                 },
               ),
@@ -80,9 +81,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
 
             // Map Theme Dropdown
-            const Text(
+            Text(
               'Map Theme',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             AppDropdown.themedDropdown<String>(
@@ -91,7 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               items: MapPalettes.paletteKeys.map((themeKey) {
                 return DropdownMenuItem(
                   value: themeKey,
-                  child: Text(Utils.capitalize(themeKey.replaceAll('_', ' '))),
+                  child: Text(Utils.capitalize(themeKey.replaceAll('_', ' ')),
+                      style: Theme.of(context).textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: _onMapThemeChanged,

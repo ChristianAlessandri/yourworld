@@ -150,11 +150,11 @@ class _MapScreenState extends State<MapScreen> {
           builder: (BuildContext context, StateSetter setModalState) {
             return Column(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Text(
                     "Countries",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 Padding(
@@ -168,7 +168,8 @@ class _MapScreenState extends State<MapScreen> {
                         .map((status) {
                       return DropdownMenuItem(
                         value: status,
-                        child: Text(Utils.capitalize(status.name)),
+                        child: Text(Utils.capitalize(status.name),
+                            style: Theme.of(context).textTheme.bodyMedium),
                       );
                     }).toList(),
                     onChanged: (newStatus) {

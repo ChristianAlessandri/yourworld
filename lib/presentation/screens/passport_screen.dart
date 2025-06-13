@@ -9,6 +9,7 @@ class PassportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Passport'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [

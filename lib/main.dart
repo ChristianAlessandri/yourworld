@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/presentation/screens/home_screen.dart';
@@ -89,43 +90,47 @@ class MainApp extends StatelessWidget {
   }
 
   TextTheme _textThemeBuilder(Brightness brightness) {
-    return TextTheme(
-      headlineLarge: TextStyle(
+    final baseTextTheme = brightness == Brightness.dark
+        ? ThemeData.dark().textTheme
+        : ThemeData.light().textTheme;
+
+    return GoogleFonts.poppinsTextTheme(baseTextTheme).copyWith(
+      headlineLarge: GoogleFonts.poppins(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
             : AppColors.lightTextPrimary,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.poppins(
         fontSize: 24,
         fontWeight: FontWeight.w600,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
             : AppColors.lightTextPrimary,
       ),
-      titleMedium: TextStyle(
+      titleMedium: GoogleFonts.poppins(
         fontSize: 18,
         fontWeight: FontWeight.w500,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
             : AppColors.lightTextSecondary,
       ),
-      bodyLarge: TextStyle(
+      bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
         fontWeight: FontWeight.normal,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
             : AppColors.lightTextPrimary,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: GoogleFonts.poppins(
         fontSize: 14,
         fontWeight: FontWeight.normal,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
             : AppColors.lightTextSecondary,
       ),
-      labelLarge: TextStyle(
+      labelLarge: GoogleFonts.poppins(
         fontSize: 16,
         fontWeight: FontWeight.bold,
         color: brightness == Brightness.dark

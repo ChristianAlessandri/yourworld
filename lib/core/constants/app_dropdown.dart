@@ -17,12 +17,8 @@ class AppDropdown {
     );
   }
 
-  static TextStyle textStyle(BuildContext context) {
-    return TextStyle(
-      fontWeight: FontWeight.w500,
-      fontSize: 16,
-      color: Theme.of(context).textTheme.bodyMedium?.color,
-    );
+  static TextStyle? textStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyMedium;
   }
 
   static Icon dropdownIcon(BuildContext context) {
