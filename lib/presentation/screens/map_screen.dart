@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:yourworld/core/constants/app_buttons.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
+import 'package:yourworld/core/constants/app_dropdown.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
+import 'package:yourworld/core/utils/utils.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
 
@@ -39,8 +42,9 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _init() async {
-    _loadUserCountriesData();
     await _loadGeoJson();
+    await _initializeCountriesWithNone();
+    _loadUserCountriesData();
   }
 
   String? _convertIsoA3ToA2(String? isoA3) {
@@ -134,6 +138,18 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  Future<void> _initializeCountriesWithNone() async {
+    final box = AppHive.countriesBox;
+    if (box.isEmpty) {
+      for (var countryName in countryPolygons.keys) {
+        final iso = nameToIsoMap[countryName];
+        if (iso != null) {
+          box.add(Country(isoA2: iso, status: CountryStatus.none));
+        }
+      }
+    }
+  }
+
   void _loadUserCountriesData() {
     final box = AppHive.countriesBox;
     visitedCountries = box.values.cast<Country>().toList();
@@ -217,7 +233,7 @@ class _MapScreenState extends State<MapScreen> {
       case CountryStatus.want:
         return Colors.orange.withOpacity(0.5);
       default:
-        return Colors.grey.withOpacity(0.3);
+        return Colors.transparent;
     }
   }
 
@@ -231,27 +247,33 @@ class _MapScreenState extends State<MapScreen> {
 
     showModalBottomSheet(
       context: scaffoldKey.currentContext!,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? AppColors.darkSurface
+          : AppColors.lightSurface,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Column(
               children: [
                 const Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.only(top: 16),
                   child: Text(
-                    "Select countries and status",
+                    "Countries",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: DropdownButton<CountryStatus>(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: AppDropdown.themedDropdown<CountryStatus>(
+                    context: context,
                     value: selectedStatus,
-                    isExpanded: true,
-                    items: CountryStatus.values.map((status) {
+                    items: CountryStatus.values
+                        .where((status) => status != CountryStatus.none)
+                        .map((status) {
                       return DropdownMenuItem(
                         value: status,
-                        child: Text(status.name.toUpperCase()),
+                        child: Text(Utils.capitalize(status.name)),
                       );
                     }).toList(),
                     onChanged: (newStatus) {
@@ -291,12 +313,16 @@ class _MapScreenState extends State<MapScreen> {
                     }).toList(),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    _saveUserCountriesData(tempMap);
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Save'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _saveUserCountriesData(tempMap);
+                      Navigator.pop(context);
+                    },
+                    style: AppButtons(context).primary(),
+                    child: const Text('Save'),
+                  ),
                 ),
               ],
             );
