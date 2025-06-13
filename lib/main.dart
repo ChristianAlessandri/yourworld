@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/presentation/screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppHive.init();
+
   runApp(const MainApp());
 }
 
