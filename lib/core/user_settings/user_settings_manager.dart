@@ -8,7 +8,6 @@ class UserSettingsManager {
     final box = AppHive.userSettingsBox;
     return box.get(_settingsKey) ??
         UserSettings(
-          isDarkTheme: false,
           mapTheme: 'default',
           mapUrlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         );
@@ -18,22 +17,10 @@ class UserSettingsManager {
     await AppHive.userSettingsBox.put(_settingsKey, newSettings);
   }
 
-  static Future<void> toggleTheme() async {
-    final current = settings;
-    await updateSettings(
-      UserSettings(
-        isDarkTheme: !current.isDarkTheme,
-        mapTheme: current.mapTheme,
-        mapUrlTemplate: current.mapUrlTemplate,
-      ),
-    );
-  }
-
   static Future<void> setMapTheme(String themeName) async {
     final current = settings;
     await updateSettings(
       UserSettings(
-        isDarkTheme: current.isDarkTheme,
         mapTheme: themeName,
         mapUrlTemplate: current.mapUrlTemplate,
       ),
@@ -44,7 +31,6 @@ class UserSettingsManager {
     final current = settings;
     await updateSettings(
       UserSettings(
-        isDarkTheme: current.isDarkTheme,
         mapTheme: current.mapTheme,
         mapUrlTemplate: urlTemplate,
       ),

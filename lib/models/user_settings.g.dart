@@ -17,21 +17,18 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserSettings(
-      isDarkTheme: fields[0] as bool,
-      mapTheme: fields[1] as String,
-      mapUrlTemplate: fields[2] as String,
+      mapTheme: fields[0] as String,
+      mapUrlTemplate: fields[1] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSettings obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.isDarkTheme)
-      ..writeByte(1)
-      ..write(obj.mapTheme)
       ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.mapTheme)
+      ..writeByte(1)
       ..write(obj.mapUrlTemplate);
   }
 
