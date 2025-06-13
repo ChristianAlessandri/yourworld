@@ -24,6 +24,17 @@ class AppHive {
 
     await Hive.openBox<UserSettings>(userSettingsBoxName);
     await Hive.openBox<Country>(countriesBoxName);
+
+    final userSettingsBox = Hive.box<UserSettings>(userSettingsBoxName);
+    if (userSettingsBox.isEmpty) {
+      userSettingsBox.put(
+        'settings',
+        UserSettings(
+          mapTheme: 'default',
+          mapUrlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        ),
+      );
+    }
   }
 
   // ========================

@@ -1,13 +1,14 @@
-import 'dart:convert';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:yourworld/core/constants/app_buttons.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
+import 'package:yourworld/core/constants/app_constants.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
+import 'package:yourworld/core/constants/app_palettes.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
+import 'package:yourworld/core/services/country_service.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
 import 'package:yourworld/core/utils/utils.dart';
 import 'package:yourworld/models/country.dart';
@@ -23,7 +24,8 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final Map<String, List<Polygon>> countryPolygons = {};
+  late final CountryService countryService;
+
   final Map<CountryStatus, List<Polygon>> polygonsByStatus = {
     CountryStatus.visited: [],
     CountryStatus.lived: [],
@@ -32,137 +34,42 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Country> visitedCountries = [];
   bool isLoaded = false;
-  Map<String, String> nameToIsoMap = {};
-  Map<String, String> isoToNameMap = {};
 
   @override
   void initState() {
     super.initState();
+    countryService = CountryService(countriesBox: AppHive.countriesBox);
     _init();
   }
 
   Future<void> _init() async {
-    await _loadGeoJson();
-    await _initializeCountriesWithNone();
-    _loadUserCountriesData();
-  }
+    await countryService.loadCountriesFromGeoJson();
 
-  String? _convertIsoA3ToA2(String? isoA3) {
-    if (isoA3 == null) return null;
+    visitedCountries =
+        countryService.countriesBox.values.cast<Country>().toList();
 
-    const isoA3toA2 = {
-      'FRA': 'FR',
-      'NOR': 'NO',
-      'SOM': 'SO',
-      'XKX': 'XK', // Kosovo
-      'PSE': 'PS',
-      'SSD': 'SS',
-      'VAT': 'VA',
-      'NAM': 'NA',
-      'KOR': 'KR',
-      'PRK': 'KP',
-      'TWN': 'TW',
-    };
-
-    return isoA3toA2[isoA3];
-  }
-
-  String? _sanitizeIsoFromName(String? name) {
-    if (name == null) return null;
-
-    const nameToIso = {
-      'France': 'FR',
-      'Norway': 'NO',
-      'Somalia': 'SO',
-      'Kosovo': 'XK',
-      'Palestine': 'PS',
-      'South Sudan': 'SS',
-      'Vatican': 'VA',
-      'Namibia': 'NA',
-      'North Korea': 'KP',
-      'South Korea': 'KR',
-      'Taiwan': 'TW',
-    };
-
-    return nameToIso[name];
-  }
-
-  Future<void> _loadGeoJson() async {
-    final jsonString =
-        await rootBundle.loadString('assets/geo/countries.geo.json');
-    final geoJson = jsonDecode(jsonString);
-    final features = geoJson['features'] as List;
-
-    for (var feature in features) {
-      final props = feature['properties'] ?? {};
-      final countryName = props['admin'];
-      String? iso = props['iso_a2'];
-
-      // Taiwan fallback
-      if (countryName != null &&
-          (countryName == 'Taiwan' || countryName.contains('Taiwan'))) {
-        iso = 'TW';
-      }
-
-      if (iso == '-99' || iso == null) {
-        // Fallback on iso_a3
-        final isoA3 = props['iso_a3'];
-        iso = _convertIsoA3ToA2(isoA3) ?? _sanitizeIsoFromName(countryName);
-      }
-
-      if (countryName == null || iso == null) continue;
-
-      nameToIsoMap[countryName] = iso;
-      isoToNameMap[iso] = countryName;
-
-      final geometry = feature['geometry'];
-      final type = geometry['type'];
-      final coordinates = geometry['coordinates'];
-
-      final polygons = <Polygon>[];
-
-      if (type == 'Polygon') {
-        polygons.add(_createPolygonFromCoords(coordinates));
-      } else if (type == 'MultiPolygon') {
-        for (var poly in coordinates) {
-          polygons.add(_createPolygonFromCoords(poly));
-        }
-      }
-
-      countryPolygons[countryName] = polygons;
-    }
+    _selectCountries();
 
     setState(() {
       isLoaded = true;
-      _selectCountries();
     });
   }
 
-  Future<void> _initializeCountriesWithNone() async {
-    final box = AppHive.countriesBox;
-    if (box.isEmpty) {
-      for (var countryName in countryPolygons.keys) {
-        final iso = nameToIsoMap[countryName];
-        if (iso != null) {
-          box.add(Country(isoA2: iso, status: CountryStatus.none));
-        }
-      }
-    }
-  }
-
   void _loadUserCountriesData() {
-    final box = AppHive.countriesBox;
-    visitedCountries = box.values.cast<Country>().toList();
+    visitedCountries =
+        countryService.countriesBox.values.cast<Country>().toList();
   }
 
   void _saveUserCountriesData(Map<String, CountryStatus> isoStatusMap) {
-    final box = AppHive.countriesBox;
+    final box = countryService.countriesBox;
 
+    // Reset all statuses
     for (var country in box.values) {
       country.status = CountryStatus.none;
       country.save();
     }
 
+    // Update statuses from isoStatusMap
     for (var entry in isoStatusMap.entries) {
       final iso = entry.key;
       final status = entry.value;
@@ -188,10 +95,10 @@ class _MapScreenState extends State<MapScreen> {
     polygonsByStatus.updateAll((_, __) => []);
 
     for (var country in visitedCountries) {
-      final name = isoToNameMap[country.isoA2];
-      if (name != null && countryPolygons.containsKey(name)) {
+      final name = countryService.isoToNameMap[country.isoA2];
+      if (name != null && countryService.countryPolygons.containsKey(name)) {
         final color = _getColorForStatus(country.status);
-        final basePolygons = countryPolygons[name]!;
+        final basePolygons = countryService.countryPolygons[name]!;
 
         final coloredPolygons = basePolygons
             .map((p) => Polygon(
@@ -209,36 +116,24 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {});
   }
 
-  Polygon _createPolygonFromCoords(List coords) {
-    final outerRing = coords[0] as List;
-    final points = outerRing
-        .map<LatLng>(
-            (coord) => LatLng(coord[1].toDouble(), coord[0].toDouble()))
-        .toList();
-
-    return Polygon(
-      points: points,
-      color: Colors.blue.withOpacity(0.5),
-      borderColor: Colors.black,
-      borderStrokeWidth: 1.0,
-    );
-  }
-
   Color _getColorForStatus(CountryStatus status) {
+    final paletteKey = UserSettingsManager.settings.mapTheme;
+    final palette = AppPalettes.getPalette(paletteKey);
+
     switch (status) {
       case CountryStatus.visited:
-        return Colors.blue.withOpacity(0.5);
+        return palette.visited.withAlpha(128);
       case CountryStatus.lived:
-        return Colors.green.withOpacity(0.5);
+        return palette.lived.withAlpha(128);
       case CountryStatus.want:
-        return Colors.orange.withOpacity(0.5);
+        return palette.want.withAlpha(128);
       default:
         return Colors.transparent;
     }
   }
 
   void _showCountrySelector() {
-    final allCountries = countryPolygons.keys.toList()..sort();
+    final allCountries = countryService.countryPolygons.keys.toList()..sort();
     Map<String, CountryStatus> tempMap = {
       for (var c in visitedCountries) c.isoA2: c.status
     };
@@ -286,7 +181,7 @@ class _MapScreenState extends State<MapScreen> {
                 Expanded(
                   child: ListView(
                     children: allCountries.map((name) {
-                      final iso = nameToIsoMap[name]!;
+                      final iso = countryService.nameToIsoMap[name]!;
                       final currentStatus = tempMap[iso];
                       final isSelected = currentStatus == selectedStatus;
 
@@ -357,7 +252,7 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 TileLayer(
                   urlTemplate: UserSettingsManager.settings.mapUrlTemplate,
-                  userAgentPackageName: 'it.yourvibes.yourworld',
+                  userAgentPackageName: AppConstants.userAgentPackageName,
                 ),
                 ...polygonsByStatus.entries.map(
                   (entry) => PolygonLayer(polygons: entry.value),
