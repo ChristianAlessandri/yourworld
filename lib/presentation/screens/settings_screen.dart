@@ -1,7 +1,10 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:yourworld/core/constants/map_palettes.dart';
 import 'package:yourworld/core/user_settings/map_url_templates.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
+import 'package:yourworld/core/utils/utils.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,11 +15,13 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late String selectedUrl;
+  late String selectedTheme;
 
   @override
   void initState() {
     super.initState();
     selectedUrl = UserSettingsManager.settings.mapUrlTemplate;
+    selectedTheme = UserSettingsManager.settings.mapTheme;
   }
 
   void _onMapUrlChanged(String? newUrl) {
@@ -27,15 +32,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     UserSettingsManager.setMapUrlTemplate(newUrl);
   }
 
+  void _onMapThemeChanged(String? newTheme) {
+    if (newTheme == null) return;
+    setState(() {
+      selectedTheme = newTheme;
+    });
+    UserSettingsManager.setMapTheme(newTheme);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: const Text('Settings'),
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(FluentIcons.chevron_left_20_filled),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
+            // Map Tile Provider Dropdown
             const Text(
               'Map Tile Provider',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -57,13 +77,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               onChanged: _onMapUrlChanged,
             ),
-            const SizedBox(height: 8),
-            Text(
-              selectedUrl,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
+            const SizedBox(height: 24),
+
+            // Map Theme Dropdown
+            const Text(
+              'Map Theme',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            AppDropdown.themedDropdown<String>(
+              context: context,
+              value: selectedTheme,
+              items: MapPalettes.paletteKeys.map((themeKey) {
+                return DropdownMenuItem(
+                  value: themeKey,
+                  child: Text(Utils.capitalize(themeKey.replaceAll('_', ' '))),
+                );
+              }).toList(),
+              onChanged: _onMapThemeChanged,
             ),
           ],
         ),

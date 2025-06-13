@@ -6,7 +6,7 @@ import 'package:yourworld/core/constants/app_buttons.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/constants/app_constants.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
-import 'package:yourworld/core/constants/app_palettes.dart';
+import 'package:yourworld/core/constants/map_palettes.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/core/services/country_service.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
@@ -104,7 +104,7 @@ class _MapScreenState extends State<MapScreen> {
             .map((p) => Polygon(
                   points: p.points,
                   color: color,
-                  borderColor: Colors.black,
+                  borderColor: Colors.transparent,
                   borderStrokeWidth: 1.0,
                 ))
             .toList();
@@ -118,15 +118,15 @@ class _MapScreenState extends State<MapScreen> {
 
   Color _getColorForStatus(CountryStatus status) {
     final paletteKey = UserSettingsManager.settings.mapTheme;
-    final palette = AppPalettes.getPalette(paletteKey);
+    final palette = MapPalettes.getPalette(paletteKey);
 
     switch (status) {
       case CountryStatus.visited:
-        return palette.visited.withAlpha(128);
+        return palette.visited;
       case CountryStatus.lived:
-        return palette.lived.withAlpha(128);
+        return palette.lived;
       case CountryStatus.want:
-        return palette.want.withAlpha(128);
+        return palette.want;
       default:
         return Colors.transparent;
     }

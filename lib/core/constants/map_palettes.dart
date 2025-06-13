@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yourworld/core/constants/tailwind_colors.dart';
 
 class StatusColorPalette {
   final Color visited;
@@ -12,22 +13,22 @@ class StatusColorPalette {
   });
 }
 
-class AppPalettes {
+class MapPalettes {
   static const Map<String, StatusColorPalette> palettes = {
     'default': StatusColorPalette(
-      visited: Colors.blueAccent,
-      lived: Colors.green,
-      want: Colors.orange,
+      visited: TailwindColors.sky500,
+      lived: TailwindColors.violet500,
+      want: TailwindColors.rose500,
     ),
     'dark': StatusColorPalette(
-      visited: Colors.indigo,
-      lived: Colors.teal,
-      want: Colors.deepOrange,
+      visited: TailwindColors.sky700,
+      lived: TailwindColors.violet700,
+      want: TailwindColors.rose700,
     ),
     'pastel': StatusColorPalette(
-      visited: Color(0xFFAEC6CF),
-      lived: Color(0xFFFFB347),
-      want: Color(0xFFFF6961),
+      visited: TailwindColors.sky300,
+      lived: TailwindColors.violet300,
+      want: TailwindColors.rose300,
     ),
   };
 
