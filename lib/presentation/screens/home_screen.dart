@@ -36,9 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.darkTextPrimary,
-        unselectedItemColor: AppColors.darkTextSecondary,
-        backgroundColor: AppColors.darkBackground,
+        selectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkTextPrimary
+            : AppColors.lightTextPrimary,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkTextSecondary
+            : AppColors.lightTextSecondary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: _selectedIndex == 0

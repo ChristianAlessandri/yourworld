@@ -264,11 +264,15 @@ class _MapScreenState extends State<MapScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100.0),
         ),
-        backgroundColor: AppColors.darkBackground,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
         onPressed: isLoaded ? _showCountrySelector : null,
-        child: const Icon(
+        child: Icon(
           FluentIcons.add_20_filled,
-          color: AppColors.darkTextPrimary,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.darkTextPrimary
+              : AppColors.lightTextPrimary,
         ),
       ),
     );

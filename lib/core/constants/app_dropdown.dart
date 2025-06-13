@@ -28,7 +28,7 @@ class AppDropdown {
   static Icon dropdownIcon(BuildContext context) {
     return Icon(
       FluentIcons.chevron_down_20_filled,
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).colorScheme.onSurface,
     );
   }
 

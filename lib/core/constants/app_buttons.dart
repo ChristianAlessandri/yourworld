@@ -16,11 +16,14 @@ class AppButtons {
   }) {
     return ElevatedButton.styleFrom(
       backgroundColor: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
-      foregroundColor: AppColors.lightTextOnPrimary,
+      foregroundColor:
+          isDark ? AppColors.darkTextOnPrimary : AppColors.lightTextOnPrimary,
       padding: padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
       ),
+      // Aggiungo un po’ di elevazione per distinzione visiva
+      elevation: 4,
     );
   }
 
@@ -35,6 +38,7 @@ class AppButtons {
         color: isDark
             ? AppColors.darkPrimaryVariant
             : AppColors.lightPrimaryVariant,
+        width: 2,
       ),
       padding: padding,
       shape: RoundedRectangleBorder(
@@ -53,6 +57,9 @@ class AppButtons {
       padding: padding,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      textStyle: TextStyle(
+        fontWeight: FontWeight.bold,
       ),
     );
   }
