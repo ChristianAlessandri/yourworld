@@ -252,7 +252,9 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 TileLayer(
                   urlTemplate: UserSettingsManager.settings.mapUrlTemplate,
+                  subdomains: ['a', 'b', 'c'],
                   userAgentPackageName: AppConstants.userAgentPackageName,
+                  additionalOptions: {'scale': ''},
                 ),
                 ...polygonsByStatus.entries.map(
                   (entry) => PolygonLayer(polygons: entry.value),
