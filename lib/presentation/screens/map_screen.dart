@@ -83,7 +83,17 @@ class _MapScreenState extends State<MapScreen> {
         existing.status = status;
         existing.save();
       } else {
-        box.add(Country(isoA2: iso, status: status));
+        final countryInfo = countryService.countriesByIso[iso];
+
+        if (countryInfo != null) {
+          box.add(Country(
+            isoA2: iso,
+            name: countryInfo.name,
+            continent: countryInfo.continent,
+            subregion: countryInfo.subregion,
+            status: status,
+          ));
+        }
       }
     }
 
@@ -95,12 +105,11 @@ class _MapScreenState extends State<MapScreen> {
     polygonsByStatus.updateAll((_, __) => []);
 
     for (var country in visitedCountries) {
-      final name = countryService.isoToNameMap[country.isoA2];
-      if (name != null && countryService.countryPolygons.containsKey(name)) {
+      final polygons = countryService.countryPolygons[country.isoA2];
+      if (polygons != null) {
         final color = _getColorForStatus(country.status);
-        final basePolygons = countryService.countryPolygons[name]!;
 
-        final coloredPolygons = basePolygons
+        final coloredPolygons = polygons
             .map((p) => Polygon(
                   points: p.points,
                   color: color,
@@ -133,7 +142,9 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _showCountrySelector() {
-    final allCountries = countryService.countryPolygons.keys.toList()..sort();
+    final allCountries = countryService.countriesByIso.values.toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+
     Map<String, CountryStatus> tempMap = {
       for (var c in visitedCountries) c.isoA2: c.status
     };
@@ -181,13 +192,13 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 Expanded(
                   child: ListView(
-                    children: allCountries.map((name) {
-                      final iso = countryService.nameToIsoMap[name]!;
+                    children: allCountries.map((country) {
+                      final iso = country.isoA2;
                       final currentStatus = tempMap[iso];
                       final isSelected = currentStatus == selectedStatus;
 
                       return CheckboxListTile(
-                        title: Text(name),
+                        title: Text(country.name),
                         value: isSelected,
                         onChanged: (bool? checked) {
                           setModalState(() {

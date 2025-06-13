@@ -114,7 +114,7 @@ class MainApp extends StatelessWidget {
         fontWeight: FontWeight.w500,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
-            : AppColors.lightTextSecondary,
+            : AppColors.lightTextPrimary,
       ),
       bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
@@ -128,14 +128,14 @@ class MainApp extends StatelessWidget {
         fontWeight: FontWeight.normal,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
-            : AppColors.lightTextSecondary,
+            : AppColors.lightTextPrimary,
       ),
       labelLarge: GoogleFonts.poppins(
         fontSize: 16,
         fontWeight: FontWeight.bold,
         color: brightness == Brightness.dark
             ? AppColors.darkTextPrimary
-            : AppColors.lightTextOnPrimary,
+            : AppColors.lightTextPrimary,
       ),
     );
   }

@@ -9,10 +9,22 @@ class Country extends HiveObject {
   String isoA2;
 
   @HiveField(1)
+  String name;
+
+  @HiveField(2)
+  String continent;
+
+  @HiveField(3)
+  String subregion;
+
+  @HiveField(4)
   CountryStatus status;
 
   Country({
     required this.isoA2,
+    required this.name,
+    required this.continent,
+    required this.subregion,
     this.status = CountryStatus.none,
   });
 }

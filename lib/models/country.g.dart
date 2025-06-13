@@ -18,17 +18,26 @@ class CountryAdapter extends TypeAdapter<Country> {
     };
     return Country(
       isoA2: fields[0] as String,
-      status: fields[1] as CountryStatus,
+      name: fields[1] as String,
+      continent: fields[2] as String,
+      subregion: fields[3] as String,
+      status: fields[4] as CountryStatus,
     );
   }
 
   @override
   void write(BinaryWriter writer, Country obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.isoA2)
       ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.continent)
+      ..writeByte(3)
+      ..write(obj.subregion)
+      ..writeByte(4)
       ..write(obj.status);
   }
 

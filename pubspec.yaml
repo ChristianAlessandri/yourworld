@@ -17,6 +17,7 @@ dependencies:
   path_provider: ^2.1.5
   country_icons: ^3.0.0
   google_fonts: ^6.2.1
+  flutter_map_cancellable_tile_provider: ^3.1.0
 
 dev_dependencies:
   flutter_test:

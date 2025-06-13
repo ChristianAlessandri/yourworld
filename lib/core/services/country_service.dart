@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart' show Color, rootBundle;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
@@ -12,8 +13,7 @@ class CountryService {
   final Box<Country> countriesBox;
 
   final Map<String, List<Polygon>> countryPolygons = {};
-  final Map<String, String> nameToIsoMap = {};
-  final Map<String, String> isoToNameMap = {};
+  final Map<String, Country> countriesByIso = {};
 
   CountryService({required this.countriesBox});
 
@@ -23,13 +23,14 @@ class CountryService {
     final features = geoJson['features'] as List;
 
     countryPolygons.clear();
-    nameToIsoMap.clear();
-    isoToNameMap.clear();
+    countriesByIso.clear();
 
     for (var feature in features) {
       final props = feature['properties'] ?? {};
-      final countryName = props['admin'];
-      String? iso = props['iso_a2'];
+      final countryName = props['admin'] as String?;
+      String? iso = props['iso_a2'] as String?;
+      final continent = props['continent'] as String? ?? '';
+      final subregion = props['subregion'] as String? ?? '';
 
       if (countryName != null &&
           (countryName == 'Taiwan' || countryName.contains('Taiwan'))) {
@@ -37,14 +38,11 @@ class CountryService {
       }
 
       if (iso == '-99' || iso == null) {
-        final isoA3 = props['iso_a3'];
+        final isoA3 = props['iso_a3'] as String?;
         iso = _convertIsoA3ToA2(isoA3) ?? _sanitizeIsoFromName(countryName);
       }
 
       if (countryName == null || iso == null) continue;
-
-      nameToIsoMap[countryName] = iso;
-      isoToNameMap[iso] = countryName;
 
       final geometry = feature['geometry'];
       final type = geometry['type'];
@@ -60,7 +58,14 @@ class CountryService {
         }
       }
 
-      countryPolygons[countryName] = polygons;
+      countryPolygons[iso] = polygons;
+
+      countriesByIso[iso] = Country(
+        isoA2: iso,
+        name: countryName,
+        continent: continent,
+        subregion: subregion,
+      );
     }
 
     await _initializeCountriesWithNone();
@@ -68,11 +73,24 @@ class CountryService {
 
   Future<void> _initializeCountriesWithNone() async {
     if (countriesBox.isEmpty) {
-      for (var countryName in countryPolygons.keys) {
-        final iso = nameToIsoMap[countryName];
-        if (iso != null) {
-          await countriesBox
-              .add(Country(isoA2: iso, status: CountryStatus.none));
+      for (var country in countriesByIso.values) {
+        await countriesBox.add(Country(
+          isoA2: country.isoA2,
+          name: country.name,
+          continent: country.continent,
+          subregion: country.subregion,
+          status: CountryStatus.none,
+        ));
+      }
+    } else {
+      // If is not empty, update existing countries
+      for (var country in countriesBox.values) {
+        final data = countriesByIso[country.isoA2];
+        if (data != null) {
+          country.name = data.name;
+          country.continent = data.continent;
+          country.subregion = data.subregion;
+          await country.save();
         }
       }
     }
@@ -127,8 +145,8 @@ class CountryService {
 
     return Polygon(
       points: points,
-      color: const Color(0xFF000000),
-      borderColor: const Color(0xFF000000),
+      color: Colors.transparent,
+      borderColor: Colors.transparent,
       borderStrokeWidth: 1.0,
     );
   }
