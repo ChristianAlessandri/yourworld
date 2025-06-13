@@ -12,15 +12,15 @@ class AppColors {
   static const lightSecondary = TailwindColors.rose500;
   static const lightSecondaryVariant = TailwindColors.rose600;
 
-  static const lightBackground = TailwindColors.slate50;
+  static const lightBackground = TailwindColors.neutral50;
   static const lightSurface = Colors.white;
-  static const lightCard = TailwindColors.slate100;
+  static const lightCard = TailwindColors.neutral100;
 
-  static const lightTextPrimary = TailwindColors.slate800;
-  static const lightTextSecondary = TailwindColors.slate600;
+  static const lightTextPrimary = TailwindColors.neutral800;
+  static const lightTextSecondary = TailwindColors.neutral600;
   static const lightTextOnPrimary = Colors.white;
 
-  static const lightDivider = TailwindColors.slate200;
+  static const lightDivider = TailwindColors.neutral200;
 
   // =====================
   // DARK THEME
@@ -30,12 +30,12 @@ class AppColors {
   static const darkSecondary = TailwindColors.rose400;
   static const darkSecondaryVariant = TailwindColors.rose500;
 
-  static const darkBackground = TailwindColors.slate900;
-  static const darkSurface = TailwindColors.slate800;
-  static const darkCard = TailwindColors.slate700;
+  static const darkBackground = TailwindColors.neutral900;
+  static const darkSurface = TailwindColors.neutral800;
+  static const darkCard = TailwindColors.neutral700;
 
-  static const darkTextPrimary = TailwindColors.slate100;
-  static const darkTextSecondary = TailwindColors.slate400;
+  static const darkTextPrimary = TailwindColors.neutral100;
+  static const darkTextSecondary = TailwindColors.neutral400;
   static const darkTextOnPrimary = Colors.white;
 
   static const darkDivider = TailwindColors.slate600;
