@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -113,7 +114,7 @@ class _MapScreenState extends State<MapScreen> {
             .map((p) => Polygon(
                   points: p.points,
                   color: color,
-                  borderColor: Colors.transparent,
+                  borderColor: AppColors.darkBackground,
                   borderStrokeWidth: 1.0,
                 ))
             .toList();
@@ -239,6 +240,161 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _handleMapTap(TapPosition tapPosition, LatLng latlng) {
+    for (var entry in countryService.countryPolygons.entries) {
+      final iso = entry.key;
+      final polygons = entry.value;
+
+      for (var polygon in polygons) {
+        if (_pointInPolygon(latlng, polygon.points)) {
+          final country = countryService.countriesByIso[iso];
+          if (country != null) {
+            _showCountryStatusPicker(country);
+            return;
+          }
+        }
+      }
+    }
+
+    //print('No country found at tapped location: $latlng');
+  }
+
+  bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
+    int i, j = polygon.length - 1;
+    bool oddNodes = false;
+
+    for (i = 0; i < polygon.length; i++) {
+      if ((polygon[i].latitude < point.latitude &&
+                  polygon[j].latitude >= point.latitude ||
+              polygon[j].latitude < point.latitude &&
+                  polygon[i].latitude >= point.latitude) &&
+          (polygon[i].longitude <= point.longitude ||
+              polygon[j].longitude <= point.longitude)) {
+        if (polygon[i].longitude +
+                (point.latitude - polygon[i].latitude) /
+                    (polygon[j].latitude - polygon[i].latitude) *
+                    (polygon[j].longitude - polygon[i].longitude) <
+            point.longitude) {
+          oddNodes = !oddNodes;
+        }
+      }
+      j = i;
+    }
+
+    return oddNodes;
+  }
+
+  void _showCountryStatusPicker(Country country) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (BuildContext context) {
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Stack(
+              children: [
+                // Background image
+                Positioned.fill(
+                  child: Image.asset(
+                    'icons/flags/png100px/${country.isoA2.toLowerCase()}.png',
+                    package: 'country_icons',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withAlpha(127)
+                          : Colors.white.withAlpha(127),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Wrap(
+                    children: [
+                      Center(
+                        child: Text(
+                          country.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading:
+                            const Icon(FluentIcons.checkbox_checked_20_filled),
+                        title: Text('Visited',
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        onTap: () {
+                          _setCountryStatus(country, CountryStatus.visited);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(FluentIcons.home_20_filled),
+                        title: Text('Lived',
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        onTap: () {
+                          _setCountryStatus(country, CountryStatus.lived);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(FluentIcons.heart_20_filled),
+                        title: Text('Want',
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        onTap: () {
+                          _setCountryStatus(country, CountryStatus.want);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(FluentIcons.border_none_20_regular),
+                        title: Text('None',
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        onTap: () {
+                          _setCountryStatus(country, CountryStatus.none);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _setCountryStatus(Country country, CountryStatus status) {
+    final existing = countryService.countriesBox.values
+        .cast<Country?>()
+        .firstWhere((c) => c?.isoA2 == country.isoA2, orElse: () => null);
+
+    if (existing != null) {
+      existing.status = status;
+      existing.save();
+    } else {
+      countryService.countriesBox.add(Country(
+        isoA2: country.isoA2,
+        name: country.name,
+        continent: country.continent,
+        subregion: country.subregion,
+        status: status,
+      ));
+    }
+
+    _loadUserCountriesData();
+    _selectCountries();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -260,6 +416,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 crs: Epsg3857(),
+                onTap: _handleMapTap,
               ),
               children: [
                 TileLayer(
