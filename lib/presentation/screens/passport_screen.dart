@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/models/country.dart';
@@ -64,65 +65,117 @@ class _PassportScreenState extends State<PassportScreen> {
     });
   }
 
+  Widget _buildStatCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required BuildContext context,
+  }) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: SizedBox(
+        width: 120,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon,
+                  size: 36, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 12),
+              Text(value,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(label, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Passport',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        title: Text('Passport', style: Theme.of(context).textTheme.titleLarge),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              icon: Icon(FluentIcons.navigation_20_filled,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.lightTextPrimary),
-              onPressed: () {
-                Navigator.push(
+          IconButton(
+            icon: Icon(FluentIcons.navigation_20_filled,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.lightTextPrimary),
+            onPressed: () {
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
+                      builder: (context) => const SettingsScreen()));
+            },
           ),
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            CircularPercentIndicator(
+              radius: 120,
+              lineWidth: 14,
+              percent: (percentageOfWorld / 100).clamp(0.0, 1.0),
+              center: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("World Explored: ",
-                      style: Theme.of(context).textTheme.bodyMedium),
-                  Text("${percentageOfWorld.toStringAsFixed(1)}%",
-                      style: Theme.of(context).textTheme.labelLarge),
+                  Text('World Explored',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    "${percentageOfWorld.toStringAsFixed(1)}%",
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ],
               ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  VanityMetrics(
-                      text: "Countries", number: countriesCount.toString()),
-                  VanityMetrics(
-                      text: "Continents", number: continentsCount.toString()),
-                  VanityMetrics(
-                      text: "Subregions", number: subregionsCount.toString())
-                ],
-              ),
-            ],
-          ),
+              progressColor: Theme.of(context).colorScheme.primary,
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withAlpha(77),
+              circularStrokeCap: CircularStrokeCap.round,
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _buildStatCard(
+                  icon: FluentIcons.flag_20_filled,
+                  label: 'Countries',
+                  value: countriesCount.toString(),
+                  context: context,
+                ),
+                _buildStatCard(
+                  icon: FluentIcons.globe_20_filled,
+                  label: 'Continents',
+                  value: continentsCount.toString(),
+                  context: context,
+                ),
+                _buildStatCard(
+                  icon: FluentIcons.location_20_filled,
+                  label: 'Subregions',
+                  value: subregionsCount.toString(),
+                  context: context,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

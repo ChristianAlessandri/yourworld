@@ -199,7 +199,8 @@ class _MapScreenState extends State<MapScreen> {
                       final isSelected = currentStatus == selectedStatus;
 
                       return CheckboxListTile(
-                        title: Text(country.name),
+                        title: Text(country.name,
+                            style: Theme.of(context).textTheme.bodyMedium),
                         value: isSelected,
                         onChanged: (bool? checked) {
                           setModalState(() {
