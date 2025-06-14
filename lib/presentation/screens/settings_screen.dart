@@ -6,6 +6,7 @@ import 'package:yourworld/core/user_settings/map_url_templates.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
 import 'package:yourworld/core/utils/utils.dart';
+import 'package:yourworld/presentation/widgets/color_preview_box.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -39,30 +40,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       selectedTheme = newTheme;
     });
     UserSettingsManager.setMapTheme(newTheme);
-  }
-
-  Widget _buildColorPreviewBox(Color color,
-      {bool isFirst = false, bool isLast = false}) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.only(
-          topLeft: isFirst ? Radius.circular(8) : Radius.zero,
-          bottomLeft: isFirst ? Radius.circular(8) : Radius.zero,
-          topRight: isLast ? Radius.circular(8) : Radius.zero,
-          bottomRight: isLast ? Radius.circular(8) : Radius.zero,
-        ),
-        border: Border(
-          top: BorderSide(color: AppColors.lightDivider, width: 1),
-          bottom: BorderSide(color: AppColors.lightDivider, width: 1),
-          left: isFirst
-              ? BorderSide(color: AppColors.lightDivider, width: 1)
-              : BorderSide.none,
-          right: BorderSide(color: AppColors.lightDivider, width: 1),
-        ),
-      ),
-    );
   }
 
   @override
@@ -130,16 +107,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Row(
               children: [
                 Expanded(
-                    child: _buildColorPreviewBox(
-                        MapPalettes.getPalette(selectedTheme).visited,
-                        isFirst: true)),
+                  child: ColorPreviewBox(
+                    color: MapPalettes.getPalette(selectedTheme).visited,
+                    isFirst: true,
+                  ),
+                ),
                 Expanded(
-                    child: _buildColorPreviewBox(
-                        MapPalettes.getPalette(selectedTheme).lived)),
+                  child: ColorPreviewBox(
+                    color: MapPalettes.getPalette(selectedTheme).lived,
+                  ),
+                ),
                 Expanded(
-                    child: _buildColorPreviewBox(
-                        MapPalettes.getPalette(selectedTheme).want,
-                        isLast: true)),
+                  child: ColorPreviewBox(
+                    color: MapPalettes.getPalette(selectedTheme).want,
+                    isLast: true,
+                  ),
+                ),
               ],
             ),
           ],
