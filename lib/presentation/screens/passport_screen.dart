@@ -4,13 +4,13 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
-import 'package:yourworld/models/badge_utils.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
 import 'package:yourworld/models/vehicle_type.dart';
 import 'package:yourworld/presentation/screens/detail_list_screen.dart';
 import 'package:yourworld/presentation/screens/settings_screen.dart';
-import 'package:yourworld/presentation/widgets/badge_shape_painter.dart';
+import 'package:yourworld/presentation/widgets/stat_card.dart';
+import 'package:yourworld/presentation/widgets/transport_badge.dart';
 
 class PassportScreen extends StatefulWidget {
   const PassportScreen({super.key});
@@ -144,79 +144,6 @@ class _PassportScreenState extends State<PassportScreen> {
           visitedItems: visitedKeys,
           groupedCountries: grouped,
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required BuildContext context,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SizedBox(
-          width: 120,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon,
-                    size: 36, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(height: 12),
-                Text(value,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(label, style: Theme.of(context).textTheme.bodyMedium),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildTransportBadge({
-    required String label,
-    required IconData icon,
-    required Set<String> usedVehicles,
-    required List<String> allVehicles,
-    required VoidCallback onTap,
-  }) {
-    final usedCount = usedVehicles.where((v) => allVehicles.contains(v)).length;
-    final percent = usedCount / allVehicles.length;
-    final level = getBadgeLevelByPercentage(percent);
-    final color = getBadgeColor(level);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        children: [
-          CustomPaint(
-            size: const Size(64, 80),
-            painter: BadgeShapePainter(color: color, level: level),
-            child: SizedBox(
-              width: 64,
-              height: 80,
-              child: Center(
-                child: Icon(icon, color: Colors.white, size: 32),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
       ),
     );
   }
@@ -358,25 +285,22 @@ class _PassportScreenState extends State<PassportScreen> {
               spacing: 12,
               runSpacing: 12,
               children: [
-                _buildStatCard(
+                StatCard(
                   icon: FluentIcons.flag_20_filled,
                   label: 'Countries',
                   value: countriesCount.toString(),
-                  context: context,
                   onTap: () => _openDetailScreen('countries'),
                 ),
-                _buildStatCard(
+                StatCard(
                   icon: FluentIcons.globe_20_filled,
                   label: 'Continents',
                   value: continentsCount.toString(),
-                  context: context,
                   onTap: () => _openDetailScreen('continents'),
                 ),
-                _buildStatCard(
+                StatCard(
                   icon: FluentIcons.location_20_filled,
                   label: 'Subregions',
                   value: subregionsCount.toString(),
-                  context: context,
                   onTap: () => _openDetailScreen('subregions'),
                 ),
               ],
@@ -385,21 +309,21 @@ class _PassportScreenState extends State<PassportScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                buildTransportBadge(
+                TransportBadge(
                   label: 'Land',
                   icon: FluentIcons.vehicle_car_20_filled,
                   usedVehicles: userUsedVehicles,
                   allVehicles: landVehicles,
                   onTap: () => _showVehiclePicker(landVehicles, 'Land'),
                 ),
-                buildTransportBadge(
+                TransportBadge(
                   label: 'Sea',
                   icon: FluentIcons.vehicle_ship_20_filled,
                   usedVehicles: userUsedVehicles,
                   allVehicles: seaVehicles,
                   onTap: () => _showVehiclePicker(seaVehicles, 'Sea'),
                 ),
-                buildTransportBadge(
+                TransportBadge(
                   label: 'Air',
                   icon: FluentIcons.airplane_20_filled,
                   usedVehicles: userUsedVehicles,
