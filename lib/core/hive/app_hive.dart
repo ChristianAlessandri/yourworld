@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:yourworld/core/constants/app_constants.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
 import 'package:yourworld/models/user_settings.dart';
@@ -30,8 +31,8 @@ class AppHive {
       userSettingsBox.put(
         'settings',
         UserSettings(
-          mapTheme: 'default',
-          mapUrlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          mapTheme: AppConstants.defaultMapTheme,
+          mapUrlTemplate: AppConstants.defaultMapUrlTemplate,
         ),
       );
     }

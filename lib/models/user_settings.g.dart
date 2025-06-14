@@ -19,17 +19,20 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
     return UserSettings(
       mapTheme: fields[0] as String,
       mapUrlTemplate: fields[1] as String,
+      usedVehicles: (fields[2] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSettings obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.mapTheme)
       ..writeByte(1)
-      ..write(obj.mapUrlTemplate);
+      ..write(obj.mapUrlTemplate)
+      ..writeByte(2)
+      ..write(obj.usedVehicles);
   }
 
   @override

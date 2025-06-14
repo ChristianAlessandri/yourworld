@@ -20,7 +20,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       home: const HomeScreen(),
     );
   }

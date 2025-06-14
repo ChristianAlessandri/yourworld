@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
+import 'package:yourworld/core/user_settings/user_settings_manager.dart';
+import 'package:yourworld/models/badge_utils.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
+import 'package:yourworld/models/vehicle_type.dart';
 import 'package:yourworld/presentation/screens/detail_list_screen.dart';
 import 'package:yourworld/presentation/screens/settings_screen.dart';
 
@@ -16,6 +19,7 @@ class PassportScreen extends StatefulWidget {
 }
 
 class _PassportScreenState extends State<PassportScreen> {
+  Set<String> userUsedVehicles = {};
   int countriesCount = 0;
   int continentsCount = 0;
   int subregionsCount = 0;
@@ -25,6 +29,7 @@ class _PassportScreenState extends State<PassportScreen> {
   void initState() {
     super.initState();
     _loadCountryCounts();
+    _loadUsedVehicles();
   }
 
   void _loadCountryCounts() {
@@ -62,6 +67,12 @@ class _PassportScreenState extends State<PassportScreen> {
       continentsCount = uniqueContinents.length;
       subregionsCount = uniqueSubregions.length;
       percentageOfWorld = percent;
+    });
+  }
+
+  void _loadUsedVehicles() {
+    setState(() {
+      userUsedVehicles = UserSettingsManager.getUsedVehicles();
     });
   }
 
@@ -174,6 +185,136 @@ class _PassportScreenState extends State<PassportScreen> {
     );
   }
 
+  Widget buildTransportBadge({
+    required String label,
+    required IconData icon,
+    required Set<String> usedVehicles,
+    required List<String> allVehicles,
+    required VoidCallback onTap,
+  }) {
+    final usedCount = usedVehicles.where((v) => allVehicles.contains(v)).length;
+    final percent = usedCount / allVehicles.length;
+    final level = getBadgeLevelByPercentage(percent);
+    final color = getBadgeColor(level);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(40),
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  color.withAlpha(255),
+                  color.withAlpha(178),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: color.withAlpha(204), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(51),
+                  offset: const Offset(1, 1),
+                  blurRadius: 2,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Icon(icon, color: Colors.white),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  void _showVehiclePicker(List<String> allVehicles, String categoryLabel) {
+    final tempSelection = Set<String>.from(userUsedVehicles);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? AppColors.darkSurface
+          : AppColors.lightSurface,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      '$categoryLabel Vehicles',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: (allVehicles.toList()..sort()).map((vehicle) {
+                        final isSelected = tempSelection.contains(vehicle);
+                        return CheckboxListTile(
+                          title: Text(vehicle,
+                              style: Theme.of(context).textTheme.bodyMedium),
+                          value: isSelected,
+                          onChanged: (checked) {
+                            setModalState(() {
+                              if (checked == true) {
+                                tempSelection.add(vehicle);
+                              } else {
+                                tempSelection.remove(vehicle);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+                        final newUsedVehicles =
+                            Set<String>.from(userUsedVehicles);
+                        newUsedVehicles
+                            .removeWhere((v) => allVehicles.contains(v));
+                        newUsedVehicles.addAll(tempSelection
+                            .where((v) => allVehicles.contains(v)));
+
+                        await UserSettingsManager.setUsedVehicles(
+                            newUsedVehicles.toList());
+
+                        if (!mounted) return;
+
+                        setState(() {
+                          userUsedVehicles = newUsedVehicles;
+                        });
+
+                        navigator.pop();
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,7 +394,34 @@ class _PassportScreenState extends State<PassportScreen> {
                   onTap: () => _openDetailScreen('subregions'),
                 ),
               ],
-            )
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                buildTransportBadge(
+                  label: 'Land',
+                  icon: FluentIcons.vehicle_car_20_filled,
+                  usedVehicles: userUsedVehicles,
+                  allVehicles: landVehicles,
+                  onTap: () => _showVehiclePicker(landVehicles, 'Land'),
+                ),
+                buildTransportBadge(
+                  label: 'Sea',
+                  icon: FluentIcons.vehicle_ship_20_filled,
+                  usedVehicles: userUsedVehicles,
+                  allVehicles: seaVehicles,
+                  onTap: () => _showVehiclePicker(seaVehicles, 'Sea'),
+                ),
+                buildTransportBadge(
+                  label: 'Air',
+                  icon: FluentIcons.airplane_20_filled,
+                  usedVehicles: userUsedVehicles,
+                  allVehicles: airVehicles,
+                  onTap: () => _showVehiclePicker(airVehicles, 'Air'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

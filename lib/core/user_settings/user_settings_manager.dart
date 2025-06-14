@@ -1,3 +1,4 @@
+import 'package:yourworld/core/constants/app_constants.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/models/user_settings.dart';
 
@@ -8,8 +9,9 @@ class UserSettingsManager {
     final box = AppHive.userSettingsBox;
     return box.get(_settingsKey) ??
         UserSettings(
-          mapTheme: 'default',
-          mapUrlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          mapTheme: AppConstants.defaultMapTheme,
+          mapUrlTemplate: AppConstants.defaultMapUrlTemplate,
+          usedVehicles: [],
         );
   }
 
@@ -35,5 +37,34 @@ class UserSettingsManager {
         mapUrlTemplate: urlTemplate,
       ),
     );
+  }
+
+  static Future<void> addUsedVehicle(String vehicle) async {
+    final currentSettings = settings;
+    final updatedVehicles = currentSettings.usedVehicles.toSet()..add(vehicle);
+    final newSettings = UserSettings(
+      mapTheme: currentSettings.mapTheme,
+      mapUrlTemplate: currentSettings.mapUrlTemplate,
+      usedVehicles: updatedVehicles.toList(),
+    );
+    await updateSettings(newSettings);
+  }
+
+  static Future<void> setUsedVehicles(List<String> vehicles) async {
+    final box = AppHive.userSettingsBox;
+    final currentSettings = box.get(_settingsKey);
+
+    final newSettings = currentSettings?.copyWith(usedVehicles: vehicles) ??
+        UserSettings(
+          mapTheme: AppConstants.defaultMapTheme,
+          mapUrlTemplate: AppConstants.defaultMapUrlTemplate,
+          usedVehicles: vehicles,
+        );
+
+    await box.put(_settingsKey, newSettings);
+  }
+
+  static Set<String> getUsedVehicles() {
+    return settings.usedVehicles.toSet();
   }
 }

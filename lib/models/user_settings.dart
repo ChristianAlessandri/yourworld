@@ -10,8 +10,24 @@ class UserSettings extends HiveObject {
   @HiveField(1)
   String mapUrlTemplate;
 
+  @HiveField(2)
+  final List<String> usedVehicles;
+
   UserSettings({
     required this.mapTheme,
     required this.mapUrlTemplate,
-  });
+    List<String>? usedVehicles,
+  }) : usedVehicles = usedVehicles ?? [];
+
+  UserSettings copyWith({
+    String? mapTheme,
+    String? mapUrlTemplate,
+    List<String>? usedVehicles,
+  }) {
+    return UserSettings(
+      mapTheme: mapTheme ?? this.mapTheme,
+      mapUrlTemplate: mapUrlTemplate ?? this.mapUrlTemplate,
+      usedVehicles: usedVehicles ?? this.usedVehicles,
+    );
+  }
 }
