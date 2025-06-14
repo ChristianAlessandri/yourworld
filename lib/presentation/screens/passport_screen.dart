@@ -281,7 +281,7 @@ class _PassportScreenState extends State<PassportScreen> {
             ),
             const SizedBox(height: 24),
             Wrap(
-              alignment: WrapAlignment.center,
+              alignment: WrapAlignment.spaceEvenly,
               spacing: 12,
               runSpacing: 12,
               children: [
@@ -306,8 +306,10 @@ class _PassportScreenState extends State<PassportScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              spacing: 12,
+              runSpacing: 12,
               children: [
                 TransportBadge(
                   label: 'Land',

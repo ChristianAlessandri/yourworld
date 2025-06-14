@@ -3,7 +3,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 
 import 'package:yourworld/presentation/screens/map_screen.dart';
-import 'package:yourworld/presentation/screens/travels_screen.dart';
 import 'package:yourworld/presentation/screens/passport_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> widgetOptions = const [
     MapScreen(),
-    TravelsScreen(),
     PassportScreen(),
   ];
 
@@ -54,12 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: _selectedIndex == 1
-                ? Icon(FluentIcons.airplane_20_filled)
-                : Icon(FluentIcons.airplane_20_regular),
-            label: 'Travels',
-          ),
-          BottomNavigationBarItem(
-            icon: _selectedIndex == 2
                 ? Icon(FluentIcons.person_20_filled)
                 : Icon(FluentIcons.person_20_regular),
             label: 'Passport',
