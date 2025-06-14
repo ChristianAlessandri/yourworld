@@ -78,7 +78,7 @@ class _PassportScreenState extends State<PassportScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              icon: Icon(FluentIcons.settings_20_filled,
+              icon: Icon(FluentIcons.navigation_20_filled,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? AppColors.darkTextPrimary
                       : AppColors.lightTextPrimary),

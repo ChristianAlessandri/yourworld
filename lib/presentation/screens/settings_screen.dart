@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/constants/map_palettes.dart';
 import 'package:yourworld/core/user_settings/map_url_templates.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
@@ -40,6 +41,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     UserSettingsManager.setMapTheme(newTheme);
   }
 
+  Widget _buildColorPreviewBox(Color color,
+      {bool isFirst = false, bool isLast = false}) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.only(
+          topLeft: isFirst ? Radius.circular(8) : Radius.zero,
+          bottomLeft: isFirst ? Radius.circular(8) : Radius.zero,
+          topRight: isLast ? Radius.circular(8) : Radius.zero,
+          bottomRight: isLast ? Radius.circular(8) : Radius.zero,
+        ),
+        border: Border(
+          top: BorderSide(color: AppColors.lightDivider, width: 1),
+          bottom: BorderSide(color: AppColors.lightDivider, width: 1),
+          left: isFirst
+              ? BorderSide(color: AppColors.lightDivider, width: 1)
+              : BorderSide.none,
+          right: BorderSide(color: AppColors.lightDivider, width: 1),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,11 +103,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               onChanged: _onMapUrlChanged,
             ),
+
             const SizedBox(height: 24),
 
-            // Map Theme Dropdown
             Text(
-              'Map Theme',
+              'Theme',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
@@ -97,6 +122,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }).toList(),
               onChanged: _onMapThemeChanged,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                    child: _buildColorPreviewBox(
+                        MapPalettes.getPalette(selectedTheme).visited,
+                        isFirst: true)),
+                Expanded(
+                    child: _buildColorPreviewBox(
+                        MapPalettes.getPalette(selectedTheme).lived)),
+                Expanded(
+                    child: _buildColorPreviewBox(
+                        MapPalettes.getPalette(selectedTheme).want,
+                        isLast: true)),
+              ],
             ),
           ],
         ),
