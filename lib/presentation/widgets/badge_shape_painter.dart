@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yourworld/models/badge_utils.dart';
+import 'package:yourworld/models/badge.dart';
 import 'dart:math';
 
 class BadgeShapePainter extends CustomPainter {

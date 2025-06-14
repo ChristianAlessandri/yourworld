@@ -2,7 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/constants/map_palettes.dart';
-import 'package:yourworld/core/user_settings/map_url_templates.dart';
+import 'package:yourworld/models/map_url_templates.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
 import 'package:yourworld/core/utils/utils.dart';

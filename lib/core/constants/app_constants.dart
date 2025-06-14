@@ -1,4 +1,4 @@
-import 'package:yourworld/core/user_settings/map_url_templates.dart';
+import 'package:yourworld/models/map_url_templates.dart';
 
 class AppConstants {
   static const String defaultMapTheme = "default";
