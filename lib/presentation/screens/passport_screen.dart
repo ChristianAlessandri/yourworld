@@ -6,7 +6,6 @@ import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
 import 'package:yourworld/presentation/screens/settings_screen.dart';
-import 'package:yourworld/presentation/widgets/vanity_metrics.dart';
 
 class PassportScreen extends StatefulWidget {
   const PassportScreen({super.key});
