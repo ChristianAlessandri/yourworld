@@ -5,6 +5,7 @@ import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
+import 'package:yourworld/presentation/screens/detail_list_screen.dart';
 import 'package:yourworld/presentation/screens/settings_screen.dart';
 
 class PassportScreen extends StatefulWidget {
@@ -64,33 +65,109 @@ class _PassportScreenState extends State<PassportScreen> {
     });
   }
 
+  void _openDetailScreen(String type) {
+    final allCountries = AppHive.countriesBox.values.cast<Country>().toList();
+    final visitedCountries = allCountries
+        .where(
+          (c) =>
+              c.status == CountryStatus.visited ||
+              c.status == CountryStatus.lived,
+        )
+        .toList();
+
+    late List<String> allKeys;
+    late Set<String> visitedKeys;
+    late Map<String, List<Country>> grouped;
+
+    switch (type) {
+      case 'countries':
+        allKeys = allCountries.map((c) => c.name).toList()..sort();
+        visitedKeys = visitedCountries.map((c) => c.name).toSet();
+        grouped = {
+          for (var c in allCountries) c.name: [c]
+        };
+        break;
+
+      case 'continents':
+        allKeys = allCountries
+            .map((c) => c.continent)
+            .where((e) => e.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+        visitedKeys = visitedCountries
+            .map((c) => c.continent)
+            .where((e) => e.isNotEmpty)
+            .toSet();
+        grouped = {
+          for (var key in allKeys)
+            key: allCountries.where((c) => c.continent == key).toList()
+        };
+        break;
+
+      case 'subregions':
+        allKeys = allCountries
+            .map((c) => c.subregion)
+            .where((e) => e.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+        visitedKeys = visitedCountries
+            .map((c) => c.subregion)
+            .where((e) => e.isNotEmpty)
+            .toSet();
+        grouped = {
+          for (var key in allKeys)
+            key: allCountries.where((c) => c.subregion == key).toList()
+        };
+        break;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailListScreen(
+          title: type[0].toUpperCase() + type.substring(1),
+          allItems: allKeys,
+          visitedItems: visitedKeys,
+          groupedCountries: grouped,
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatCard({
     required IconData icon,
     required String label,
     required String value,
     required BuildContext context,
+    required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SizedBox(
-        width: 120,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon,
-                  size: 36, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(height: 12),
-              Text(value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(label, style: Theme.of(context).textTheme.bodyMedium),
-            ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: SizedBox(
+          width: 120,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon,
+                    size: 36, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(height: 12),
+                Text(value,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(label, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
           ),
         ),
       ),
@@ -159,21 +236,24 @@ class _PassportScreenState extends State<PassportScreen> {
                   label: 'Countries',
                   value: countriesCount.toString(),
                   context: context,
+                  onTap: () => _openDetailScreen('countries'),
                 ),
                 _buildStatCard(
                   icon: FluentIcons.globe_20_filled,
                   label: 'Continents',
                   value: continentsCount.toString(),
                   context: context,
+                  onTap: () => _openDetailScreen('continents'),
                 ),
                 _buildStatCard(
                   icon: FluentIcons.location_20_filled,
                   label: 'Subregions',
                   value: subregionsCount.toString(),
                   context: context,
+                  onTap: () => _openDetailScreen('subregions'),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
