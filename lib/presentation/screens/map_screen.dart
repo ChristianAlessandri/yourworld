@@ -433,6 +433,7 @@ class _MapScreenState extends State<MapScreen> {
                   subdomains: ['a', 'b', 'c'],
                   userAgentPackageName: AppConstants.userAgentPackageName,
                   additionalOptions: {'scale': ''},
+                  tileProvider: NetworkTileProvider(),
                 ),
                 ...polygonsByStatus.entries.map(
                   (entry) => PolygonLayer(polygons: entry.value),
