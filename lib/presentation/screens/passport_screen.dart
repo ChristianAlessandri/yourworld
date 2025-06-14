@@ -10,6 +10,7 @@ import 'package:yourworld/models/country_status.dart';
 import 'package:yourworld/models/vehicle_type.dart';
 import 'package:yourworld/presentation/screens/detail_list_screen.dart';
 import 'package:yourworld/presentation/screens/settings_screen.dart';
+import 'package:yourworld/presentation/widgets/badge_shape_painter.dart';
 
 class PassportScreen extends StatefulWidget {
   const PassportScreen({super.key});
@@ -199,33 +200,18 @@ class _PassportScreenState extends State<PassportScreen> {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(40),
+      borderRadius: BorderRadius.circular(16),
       child: Column(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  color.withAlpha(255),
-                  color.withAlpha(178),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          CustomPaint(
+            size: const Size(64, 80),
+            painter: BadgeShapePainter(color: color, level: level),
+            child: SizedBox(
+              width: 64,
+              height: 80,
+              child: Center(
+                child: Icon(icon, color: Colors.white, size: 32),
               ),
-              border: Border.all(color: color.withAlpha(204), width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(51),
-                  offset: const Offset(1, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-            child: Center(
-              child: Icon(icon, color: Colors.white),
             ),
           ),
           const SizedBox(height: 8),
