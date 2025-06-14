@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/models/country.dart';
 import 'package:yourworld/models/country_status.dart';
 
@@ -27,7 +28,10 @@ class DetailListScreen extends StatelessWidget {
         title: Text(title, style: Theme.of(context).textTheme.titleLarge),
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(FluentIcons.chevron_left_20_filled),
+          icon: Icon(FluentIcons.chevron_left_20_filled,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -65,11 +69,18 @@ class DetailListScreen extends StatelessWidget {
                     ),
                   ),
                   children: sortedCountries.map((c) {
-                    final statusText = c.status == CountryStatus.visited
-                        ? 'Visited'
-                        : c.status == CountryStatus.lived
-                            ? 'Lived'
-                            : 'None';
+                    final statusText = () {
+                      switch (c.status) {
+                        case CountryStatus.visited:
+                          return 'Visited';
+                        case CountryStatus.lived:
+                          return 'Lived';
+                        case CountryStatus.want:
+                          return 'Want';
+                        default:
+                          return 'None';
+                      }
+                    }();
 
                     return ListTile(
                       title: Text(c.name),

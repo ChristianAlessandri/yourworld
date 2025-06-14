@@ -72,7 +72,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text('Settings', style: Theme.of(context).textTheme.titleLarge),
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(FluentIcons.chevron_left_20_filled),
+          icon: Icon(FluentIcons.chevron_left_20_filled,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
