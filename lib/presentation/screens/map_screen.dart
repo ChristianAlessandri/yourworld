@@ -308,11 +308,19 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 Positioned.fill(
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
                     child: Container(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withAlpha(127)
-                          : Colors.white.withAlpha(127),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black.withAlpha(100) // ~40% opacity
+                            : Colors.white.withAlpha(38), // ~15% opacity
+                        border: Border.all(
+                          color: Colors.white.withAlpha(51), // ~20% opacity
+                          width: 0.5,
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                      ),
                     ),
                   ),
                 ),
