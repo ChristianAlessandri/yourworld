@@ -21,47 +21,33 @@ class UserSettingsManager {
 
   static Future<void> setMapTheme(String themeName) async {
     final current = settings;
-    await updateSettings(
-      UserSettings(
-        mapTheme: themeName,
-        mapUrlTemplate: current.mapUrlTemplate,
-      ),
-    );
+    await updateSettings(current.copyWith(mapTheme: themeName));
   }
 
   static Future<void> setMapUrlTemplate(String urlTemplate) async {
     final current = settings;
-    await updateSettings(
-      UserSettings(
-        mapTheme: current.mapTheme,
-        mapUrlTemplate: urlTemplate,
-      ),
-    );
+    await updateSettings(current.copyWith(mapUrlTemplate: urlTemplate));
   }
 
   static Future<void> addUsedVehicle(String vehicle) async {
     final currentSettings = settings;
     final updatedVehicles = currentSettings.usedVehicles.toSet()..add(vehicle);
-    final newSettings = UserSettings(
-      mapTheme: currentSettings.mapTheme,
-      mapUrlTemplate: currentSettings.mapUrlTemplate,
+
+    final newSettings = currentSettings.copyWith(
       usedVehicles: updatedVehicles.toList(),
     );
+
     await updateSettings(newSettings);
   }
 
   static Future<void> setUsedVehicles(List<String> vehicles) async {
-    final box = AppHive.userSettingsBox;
-    final currentSettings = box.get(_settingsKey);
+    final currentSettings = settings;
 
-    final newSettings = currentSettings?.copyWith(usedVehicles: vehicles) ??
-        UserSettings(
-          mapTheme: AppConstants.defaultMapTheme,
-          mapUrlTemplate: AppConstants.defaultMapUrlTemplate,
-          usedVehicles: vehicles,
-        );
+    final newSettings = currentSettings.copyWith(
+      usedVehicles: vehicles,
+    );
 
-    await box.put(_settingsKey, newSettings);
+    await updateSettings(newSettings);
   }
 
   static Set<String> getUsedVehicles() {
