@@ -6,6 +6,7 @@ import 'package:yourworld/models/map_url_templates.dart';
 import 'package:yourworld/core/user_settings/user_settings_manager.dart';
 import 'package:yourworld/core/constants/app_dropdown.dart';
 import 'package:yourworld/core/utils/utils.dart';
+import 'package:yourworld/presentation/screens/info_screen.dart';
 import 'package:yourworld/presentation/widgets/color_preview_box.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -58,72 +59,95 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView(
+        child: Column(
           children: [
-            // Map Tile Provider Dropdown
-            Text(
-              'Map Tile Provider',
-              style: Theme.of(context).textTheme.titleMedium,
+            Expanded(
+              child: ListView(
+                children: [
+                  // Map Tile Provider Dropdown
+                  Text(
+                    'Map Tile Provider',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  AppDropdown.themedDropdown<String>(
+                    context: context,
+                    value: selectedUrl,
+                    items: List.generate(
+                      MapUrlTemplates.all.length,
+                      (index) {
+                        final url = MapUrlTemplates.all[index];
+                        final name = MapUrlTemplates.names[index];
+                        return DropdownMenuItem(
+                          value: url,
+                          child: Text(name,
+                              style: Theme.of(context).textTheme.bodyMedium),
+                        );
+                      },
+                    ),
+                    onChanged: _onMapUrlChanged,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Text(
+                    'Theme',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  AppDropdown.themedDropdown<String>(
+                    context: context,
+                    value: selectedTheme,
+                    items: MapPalettes.paletteKeys.map((themeKey) {
+                      return DropdownMenuItem(
+                        value: themeKey,
+                        child: Text(
+                            Utils.capitalize(themeKey.replaceAll('_', ' ')),
+                            style: Theme.of(context).textTheme.bodyMedium),
+                      );
+                    }).toList(),
+                    onChanged: _onMapThemeChanged,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ColorPreviewBox(
+                          color: MapPalettes.getPalette(selectedTheme).visited,
+                          isFirst: true,
+                        ),
+                      ),
+                      Expanded(
+                        child: ColorPreviewBox(
+                          color: MapPalettes.getPalette(selectedTheme).lived,
+                        ),
+                      ),
+                      Expanded(
+                        child: ColorPreviewBox(
+                          color: MapPalettes.getPalette(selectedTheme).want,
+                          isLast: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            AppDropdown.themedDropdown<String>(
-              context: context,
-              value: selectedUrl,
-              items: List.generate(
-                MapUrlTemplates.all.length,
-                (index) {
-                  final url = MapUrlTemplates.all[index];
-                  final name = MapUrlTemplates.names[index];
-                  return DropdownMenuItem(
-                    value: url,
-                    child: Text(name,
-                        style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: Icon(FluentIcons.info_20_filled),
+                label: Text(
+                  'More information',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const InfoScreen()),
                   );
                 },
               ),
-              onChanged: _onMapUrlChanged,
-            ),
-
-            const SizedBox(height: 24),
-
-            Text(
-              'Theme',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            AppDropdown.themedDropdown<String>(
-              context: context,
-              value: selectedTheme,
-              items: MapPalettes.paletteKeys.map((themeKey) {
-                return DropdownMenuItem(
-                  value: themeKey,
-                  child: Text(Utils.capitalize(themeKey.replaceAll('_', ' ')),
-                      style: Theme.of(context).textTheme.bodyMedium),
-                );
-              }).toList(),
-              onChanged: _onMapThemeChanged,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ColorPreviewBox(
-                    color: MapPalettes.getPalette(selectedTheme).visited,
-                    isFirst: true,
-                  ),
-                ),
-                Expanded(
-                  child: ColorPreviewBox(
-                    color: MapPalettes.getPalette(selectedTheme).lived,
-                  ),
-                ),
-                Expanded(
-                  child: ColorPreviewBox(
-                    color: MapPalettes.getPalette(selectedTheme).want,
-                    isLast: true,
-                  ),
-                ),
-              ],
             ),
           ],
         ),
