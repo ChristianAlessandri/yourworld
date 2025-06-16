@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:yourworld/core/constants/app_colors.dart';
 import 'package:yourworld/core/hive/app_hive.dart';
 import 'package:yourworld/presentation/screens/home_screen.dart';
+import 'package:yourworld/presentation/widgets/disclaimer_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,7 @@ class MainApp extends StatelessWidget {
       theme: _buildLightTheme(),
       darkTheme: _buildDarkTheme(),
       themeMode: ThemeMode.system,
-      home: const HomeScreen(),
+      home: const DisclaimerWrapper(child: HomeScreen()),
     );
   }
 
