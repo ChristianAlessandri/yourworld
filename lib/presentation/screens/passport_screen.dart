@@ -264,10 +264,7 @@ class _PassportScreenState extends State<PassportScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('World Explored',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold)),
+                      style: Theme.of(context).textTheme.headlineMedium),
                   Text(
                     "${percentageOfWorld.toStringAsFixed(1)}%",
                     style: Theme.of(context).textTheme.headlineSmall,

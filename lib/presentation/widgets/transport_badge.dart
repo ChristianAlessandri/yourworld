@@ -42,7 +42,7 @@ class TransportBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(label, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );

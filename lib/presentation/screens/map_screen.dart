@@ -310,9 +310,7 @@ class _MapScreenState extends State<MapScreen> {
                     filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.black.withAlpha(100) // ~40% opacity
-                            : Colors.white.withAlpha(38), // ~15% opacity
+                        color: Colors.black.withAlpha(100),
                         border: Border.all(
                           color: Colors.white.withAlpha(51), // ~20% opacity
                           width: 0.5,
@@ -328,44 +326,61 @@ class _MapScreenState extends State<MapScreen> {
                   child: Wrap(
                     children: [
                       Center(
-                        child: Text(
-                          country.name,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
+                        child: Text(country.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(color: AppColors.darkTextPrimary)),
                       ),
                       const SizedBox(height: 16),
                       ListTile(
-                        leading:
-                            const Icon(FluentIcons.checkbox_checked_20_filled),
+                        leading: const Icon(
+                            FluentIcons.checkbox_checked_20_filled,
+                            color: AppColors.darkTextPrimary),
                         title: Text('Visited',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: AppColors.darkTextPrimary)),
                         onTap: () {
                           _setCountryStatus(country, CountryStatus.visited);
                           Navigator.pop(context);
                         },
                       ),
                       ListTile(
-                        leading: const Icon(FluentIcons.home_20_filled),
+                        leading: const Icon(FluentIcons.home_20_filled,
+                            color: AppColors.darkTextPrimary),
                         title: Text('Lived',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: AppColors.darkTextPrimary)),
                         onTap: () {
                           _setCountryStatus(country, CountryStatus.lived);
                           Navigator.pop(context);
                         },
                       ),
                       ListTile(
-                        leading: const Icon(FluentIcons.heart_20_filled),
+                        leading: const Icon(FluentIcons.heart_20_filled,
+                            color: AppColors.darkTextPrimary),
                         title: Text('Want',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: AppColors.darkTextPrimary)),
                         onTap: () {
                           _setCountryStatus(country, CountryStatus.want);
                           Navigator.pop(context);
                         },
                       ),
                       ListTile(
-                        leading: const Icon(FluentIcons.border_none_20_regular),
+                        leading: const Icon(FluentIcons.border_none_20_regular,
+                            color: AppColors.darkTextPrimary),
                         title: Text('None',
-                            style: Theme.of(context).textTheme.bodyMedium),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: AppColors.darkTextPrimary)),
                         onTap: () {
                           _setCountryStatus(country, CountryStatus.none);
                           Navigator.pop(context);
