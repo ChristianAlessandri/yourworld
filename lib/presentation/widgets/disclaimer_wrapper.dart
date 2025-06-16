@@ -55,15 +55,14 @@ class _DisclaimerWrapperState extends State<DisclaimerWrapper> {
             ),
           ),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () async {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('disclaimer_shown', true);
                 // ignore: use_build_context_synchronously
                 if (mounted) Navigator.pop(context);
               },
-              child: Text("I Understand",
-                  style: Theme.of(context).textTheme.bodyMedium),
+              child: Text("I Understand"),
             ),
           ],
         );

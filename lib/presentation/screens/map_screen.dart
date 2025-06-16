@@ -229,7 +229,6 @@ class _MapScreenState extends State<MapScreen> {
                       _saveUserCountriesData(tempMap);
                       Navigator.pop(context);
                     },
-                    style: AppButtons(context).primary(),
                     child: const Text('Save'),
                   ),
                 ),
