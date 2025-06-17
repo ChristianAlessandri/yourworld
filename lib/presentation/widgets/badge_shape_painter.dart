@@ -44,7 +44,7 @@ class BadgeShapePainter extends CustomPainter {
           baseColor.withAlpha(204),
           Colors.black.withAlpha(25),
         ],
-        stops: [0.0, 0.25, 0.6, 0.95],
+        stops: [0.0, 0.1, 0.6, 0.95],
       );
     }
 

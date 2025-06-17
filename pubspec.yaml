@@ -1,7 +1,7 @@
 name: yourworld
 description: "Travel tracker"
 publish_to: "none"
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ^3.6.0
