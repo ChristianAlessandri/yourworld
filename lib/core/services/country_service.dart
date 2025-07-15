@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -149,5 +149,17 @@ class CountryService {
       borderColor: Colors.transparent,
       borderStrokeWidth: 1.0,
     );
+  }
+
+  Future<Map<String, dynamic>?> fetchCountryDetails(String isoA2) async {
+    final url = Uri.parse('https://restcountries.com/v3.1/alpha/$isoA2');
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List data = json.decode(response.body);
+      return data.isNotEmpty ? data[0] : null;
+    } else {
+      return null;
+    }
   }
 }

@@ -2,7 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
-## [Unreleased]
+## [0.1.3] - 2025-07-15
+
+### Added
+
+- General countries data.
 
 ### Changed
 

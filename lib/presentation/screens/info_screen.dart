@@ -13,86 +13,86 @@ class InfoScreen extends StatelessWidget {
     }
   }
 
+  Widget _sectionTitle(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0, top: 24),
+      child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+    );
+  }
+
+  Widget _paragraph(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('Information', style: Theme.of(context).textTheme.titleLarge),
+        title: Text(
+          'Information',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(FluentIcons.chevron_left_20_filled,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.darkTextPrimary
-                  : AppColors.lightTextPrimary),
+          icon: Icon(
+            FluentIcons.chevron_left_20_filled,
+            color:
+                isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
+          tooltip: 'Back',
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: ListView(
+          physics: const BouncingScrollPhysics(),
           children: [
-            Text(
-              'About the App',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(
+            _sectionTitle(context, 'About the App'),
+            _paragraph(
+              context,
               'This app allows users to mark the countries they have visited, lived in, or want to visit. The data is stored locally on your device and is not shared with any third parties.',
-              style: textTheme.bodyMedium,
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Map and Country Boundaries',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(
+            _sectionTitle(context, 'Map and Country Boundaries'),
+            _paragraph(
+              context,
               'The map boundaries used in this app are based on a GeoJSON file from geojson-maps.kyd.au, an open-source project.',
-              style: textTheme.bodyMedium,
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Important Note:',
-              style:
-                  textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            Text(
+            _sectionTitle(context, 'Important Note'),
+            _paragraph(
+              context,
               'Displayed borders may not accurately reflect official or internationally recognized boundaries. The data is intended for illustrative and personal use only, and does not imply any political stance.',
-              style: textTheme.bodyMedium,
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Disclaimer',
-              style: textTheme.titleLarge,
+            _sectionTitle(context, 'Country Data'),
+            _paragraph(
+              context,
+              'The country data displayed in this app may not be accurate or up to date. All information is sourced from restcountries.com and is provided “as is” without warranties of any kind. Please verify details independently if needed.',
             ),
-            const SizedBox(height: 12),
-            Text(
+            _sectionTitle(context, 'Disclaimer'),
+            _paragraph(
+              context,
               'This app is provided "as is", without warranties of any kind. The developer is not responsible for any inaccuracies, misuse of the data, or any consequences arising from the use of the app.',
-              style: textTheme.bodyMedium,
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Developer',
-              style: textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Created by Christian Alessandri.',
-              style: textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 6),
+            _sectionTitle(context, 'Developer'),
+            _paragraph(context, 'Created by Christian Alessandri.'),
             GestureDetector(
               onTap: _launchURL,
               child: Text(
                 'https://christianalessandri.yourvibes.it',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
               ),
             ),
           ],

@@ -254,8 +254,6 @@ class _MapScreenState extends State<MapScreen> {
         }
       }
     }
-
-    //print('No country found at tapped location: $latlng');
   }
 
   bool _pointInPolygon(LatLng point, List<LatLng> polygon) {
@@ -283,116 +281,188 @@ class _MapScreenState extends State<MapScreen> {
     return oddNodes;
   }
 
-  void _showCountryStatusPicker(Country country) {
+  void _showCountryStatusPicker(Country country) async {
+    final details = await countryService.fetchCountryDetails(country.isoA2);
+    int selectedTab = 0; // 0 = status, 1 = info
+
     showModalBottomSheet(
-        context: context,
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.darkSurface
-            : AppColors.lightSurface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        builder: (BuildContext context) {
-          return ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Stack(
+      context: scaffoldKey.currentContext!,
+      backgroundColor:
+          Theme.of(scaffoldKey.currentContext!).brightness == Brightness.dark
+              ? AppColors.darkSurface
+              : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        final flagUrl = details?['flags']?['png'];
+        final capital = (details?['capital'] as List?)?.join(', ') ?? 'N/A';
+        final population = details?['population']?.toString() ?? 'N/A';
+        final region = details?['region'] ?? 'N/A';
+        final subregion = details?['subregion'] ?? 'N/A';
+        final currencies = details?['currencies'] as Map<String, dynamic>?;
+        String currencyInfo = 'N/A';
+        if (currencies != null && currencies.isNotEmpty) {
+          final currency = currencies.values.first;
+          currencyInfo = '${currency['name']} (${currency['symbol'] ?? 'N/A'})';
+        }
+        final languages = details?['languages'] as Map<String, dynamic>?;
+        String languagesInfo = 'N/A';
+        if (languages != null && languages.isNotEmpty) {
+          languagesInfo = languages.values.join(', ');
+        }
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
               children: [
-                // Background image
-                Positioned.fill(
-                  child: Image.asset(
-                    'icons/flags/png100px/${country.isoA2.toLowerCase()}.png',
-                    package: 'country_icons',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withAlpha(100),
-                        border: Border.all(
-                          color: Colors.white.withAlpha(51), // ~20% opacity
-                          width: 0.5,
-                        ),
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                      ),
-                    ),
-                  ),
-                ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Wrap(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Center(
-                        child: Text(country.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(color: AppColors.darkTextPrimary)),
-                      ),
-                      const SizedBox(height: 16),
-                      ListTile(
-                        leading: const Icon(
-                            FluentIcons.checkbox_checked_20_filled,
-                            color: AppColors.darkTextPrimary),
-                        title: Text('Visited',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: AppColors.darkTextPrimary)),
-                        onTap: () {
-                          _setCountryStatus(country, CountryStatus.visited);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(FluentIcons.home_20_filled,
-                            color: AppColors.darkTextPrimary),
-                        title: Text('Lived',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: AppColors.darkTextPrimary)),
-                        onTap: () {
-                          _setCountryStatus(country, CountryStatus.lived);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(FluentIcons.heart_20_filled,
-                            color: AppColors.darkTextPrimary),
-                        title: Text('Want',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: AppColors.darkTextPrimary)),
-                        onTap: () {
-                          _setCountryStatus(country, CountryStatus.want);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(FluentIcons.border_none_20_regular,
-                            color: AppColors.darkTextPrimary),
-                        title: Text('None',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: AppColors.darkTextPrimary)),
-                        onTap: () {
-                          _setCountryStatus(country, CountryStatus.none);
-                          Navigator.pop(context);
-                        },
+                      if (flagUrl != null)
+                        Image.network(flagUrl, width: 48, height: 36),
+                      const SizedBox(width: 8),
+                      Text(
+                        country.name,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: selectedTab == 0
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.2)
+                                : Colors.transparent,
+                          ),
+                          onPressed: () => setState(() => selectedTab = 0),
+                          child: const Text('Status'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: selectedTab == 1
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.2)
+                                : Colors.transparent,
+                          ),
+                          onPressed: () => setState(() => selectedTab = 1),
+                          child: const Text('Info'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Expanded(
+                  child: selectedTab == 0
+                      ? _buildStatusOptions(context, country)
+                      : _buildCountryInfo(
+                          context,
+                          capital,
+                          population,
+                          region,
+                          subregion,
+                          currencyInfo,
+                          languagesInfo,
+                        ),
+                ),
               ],
-            ),
-          );
-        });
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildStatusOptions(BuildContext context, Country country) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        ListTile(
+          leading: const Icon(FluentIcons.checkbox_checked_20_filled),
+          title: const Text('Visited'),
+          onTap: () {
+            _setCountryStatus(country, CountryStatus.visited);
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(FluentIcons.home_20_filled),
+          title: const Text('Lived'),
+          onTap: () {
+            _setCountryStatus(country, CountryStatus.lived);
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(FluentIcons.heart_20_filled),
+          title: const Text('Want'),
+          onTap: () {
+            _setCountryStatus(country, CountryStatus.want);
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(FluentIcons.border_none_20_regular),
+          title: const Text('None'),
+          onTap: () {
+            _setCountryStatus(country, CountryStatus.none);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCountryInfo(
+    BuildContext context,
+    String capital,
+    String population,
+    String region,
+    String subregion,
+    String currency,
+    String languages,
+  ) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        ListTile(
+          title: const Text("Capital"),
+          subtitle: Text(capital),
+        ),
+        ListTile(
+          title: const Text("Population"),
+          subtitle: Text(population),
+        ),
+        ListTile(
+          title: const Text("Region"),
+          subtitle: Text('$region • $subregion'),
+        ),
+        ListTile(
+          title: const Text("Currency"),
+          subtitle: Text(currency),
+        ),
+        ListTile(
+          title: const Text("Official Languages"),
+          subtitle: Text(languages),
+        ),
+      ],
+    );
   }
 
   void _setCountryStatus(Country country, CountryStatus status) {
