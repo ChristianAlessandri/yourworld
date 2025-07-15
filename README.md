@@ -2,6 +2,6 @@
 
 Travel tracker.
 
-# Changelog
+## 📦 Changelog
 
-[Changelog](CHANGELOG.md)
+Go to [Changelog](CHANGELOG.md)
