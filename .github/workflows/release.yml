@@ -1,10 +1,10 @@
 name: Yourworld Release
 
 on:
-  workflow_dispatch: # allows you to start the release manually from GitHub
+  workflow_dispatch:
   push:
     tags:
-      - "v*" # start the workflow when you push a tag
+      - "v*"
 
 jobs:
   build-release:
@@ -19,15 +19,41 @@ jobs:
         with:
           flutter-version: "3.27.1"
 
+      - name: Create keystore directory
+        run: mkdir -p android/app
+
+      - name: Restore keystore
+        run: |
+          echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
+      - name: Create key.properties
+        run: |
+          cat <<EOF > android/key.properties
+          storePassword=${{ secrets.STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=upload
+          storeFile=../app/upload-keystore.jks
+          EOF
+
+      - name: Verify keystore setup
+        run: |
+          ls -la android/app/
+          cat android/key.properties
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build release APK
         run: flutter build apk --release
 
+      - name: Build release AAB (for Play Store)
+        run: flutter build appbundle --release
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
