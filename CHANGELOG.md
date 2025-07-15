@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
-## [Unreleased] - 2025-07-15
+## [Unreleased]
 
 ### Changed
 
