@@ -12,3 +12,7 @@ Possibility of customizing the palette identifying the states and the style of t
 ## 0.1.1
 
 Improved style consistency and color contrast.
+
+## 0.1.2
+
+Improved badges style.
