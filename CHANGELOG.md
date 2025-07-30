@@ -2,6 +2,12 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
+## [0.1.3.1] - 2025-07-30
+
+### Changed
+
+- App icon.
+
 ## [0.1.3] - 2025-07-15
 
 ### Added
