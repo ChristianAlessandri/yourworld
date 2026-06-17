@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
-## [0.1.3.6] - 2026-06-16
+## [0.1.3.7] - 2026-06-16
 
 ### Chore
 

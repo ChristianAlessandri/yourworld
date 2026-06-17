@@ -41,7 +41,7 @@ class AppDropdown {
             : AppColors.lightSurface,
       ),
       child: DropdownButtonFormField<T>(
-        initialValue: value,
+        value: value,
         isExpanded: true,
         decoration: decoration(context),
         style: textStyle(context),
