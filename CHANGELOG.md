@@ -2,6 +2,12 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
+## [0.1.3.5] - 2026-06-16
+
+### Chore
+
+- Fixed the dependency versions.
+
 ## [0.1.3.4] - 2025-07-30
 
 ### Changed
